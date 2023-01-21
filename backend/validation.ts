@@ -17,7 +17,7 @@ const validators = {
   connectTo: z.string().transform((id) => id as Id),
   disconnectFrom: z.void(),
   rtcDescription: z.string(),
-  rtcIceCandidate: z.union([z.string(), z.null()]),
+  rtcIceCandidate: z.string(),
 };
 
 function validateEvent<EventName extends keyof typeof validators>(

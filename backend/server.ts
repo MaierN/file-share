@@ -67,6 +67,8 @@ function handleClient(
   });
 
   addEventHandler(socket, "connectTo", (otherId) => {
+    // TODO rate limit
+
     console.log(`client ${clientId} wants to connect to ${otherId}`);
 
     if (clientId === otherId) {

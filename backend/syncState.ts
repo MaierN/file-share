@@ -13,7 +13,7 @@ type ClientState = {
     isMaster: boolean;
     otherId: Id;
     otherRtcDescription?: string;
-    otherLastIceCandidate?: string | null;
+    otherLastIceCandidate?: string;
   };
 };
 

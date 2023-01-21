@@ -5,6 +5,8 @@ import Head from "next/head";
 
 // TODO handle /link/:id pages
 
+// TODO favicon
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
