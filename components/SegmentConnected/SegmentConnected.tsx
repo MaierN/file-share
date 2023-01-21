@@ -19,7 +19,29 @@ export default function SegmentConnected() {
     peerConnection.current.onicecandidate = (e) => {
       socket.emit("rtcIceCandidate", JSON.stringify(e.candidate));
     };
+
+    peerConnection.current.ondatachannel = (e) => {
+      const dataChannel = e.channel;
+      console.log(`data channel ${dataChannel.label} received`);
+      dataChannel.onmessage = (e) => {
+        console.log("received message:", e.data);
+      };
+
+      dataChannel.send("bonjour du slave");
+    };
+
     if (connectedTo.isMaster) {
+      const testDataChannel =
+        peerConnection.current.createDataChannel("testDataChannel");
+      testDataChannel.onopen = () => {
+        console.log(`data ${testDataChannel.label} channel opened`);
+      };
+      testDataChannel.onmessage = (e) => {
+        console.log("received message:", e.data);
+
+        testDataChannel.send("bonjour du master");
+      };
+
       peerConnection.current.createOffer().then((description) => {
         peerConnection.current.setLocalDescription(description).then(() => {
           socket.emit("rtcDescription", JSON.stringify(description));
