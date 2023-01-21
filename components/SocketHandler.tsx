@@ -14,10 +14,14 @@ import {
   ServerToClientEvents,
 } from "../shared/types";
 import LoadingIndicator from "./LoadingIndicator/LoadingIndicator";
+import { ClientState } from "../backend/syncState";
+import produce from "immer";
+import { applyPatch } from "fast-json-patch";
 
 type SocketContextType = {
   connected: boolean;
-  selfId: Id;
+  serverState: ClientState;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 };
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -31,12 +35,13 @@ function useSocketContext() {
 }
 
 function SocketHandler({ children }: { children: ReactNode }) {
-  const socket = useRef<null | Socket<
-    ServerToClientEvents,
-    ClientToServerEvents
-  >>(null);
+  const socket = useRef<
+    Socket<ServerToClientEvents, ClientToServerEvents> | undefined
+  >(undefined);
   const [connected, setConnected] = useState<boolean>(false);
-  const [selfId, setSelfId] = useState<Id | undefined>(undefined);
+  const [serverState, setServerState] = useState<ClientState | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     async function connect() {
@@ -55,9 +60,22 @@ function SocketHandler({ children }: { children: ReactNode }) {
         setConnected(false);
       });
 
-      socket.current.on("selfId", (id) => {
-        console.log("selfId", id);
-        setSelfId(id);
+      socket.current.on("initState", (state) => {
+        console.log("initState", state);
+        setServerState(state);
+      });
+
+      socket.current.on("diffState", (diff) => {
+        setServerState((prevState) =>
+          produce(prevState, (draft) => {
+            applyPatch(draft, diff);
+          })
+        );
+      });
+
+      socket.current.on("showMessage", (message) => {
+        // TODO proper message
+        console.log("showMessage:", message.type, message.text);
       });
     }
     const f = connect();
@@ -69,12 +87,18 @@ function SocketHandler({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  if (!connected || selfId === undefined) {
+  useEffect(() => {
+    console.log("serverState:", serverState);
+  }, [serverState]);
+
+  if (!connected || socket.current === undefined || serverState === undefined) {
     return <LoadingIndicator />;
   }
 
   return (
-    <SocketContext.Provider value={{ connected, selfId }}>
+    <SocketContext.Provider
+      value={{ connected, serverState, socket: socket.current }}
+    >
       {children}
     </SocketContext.Provider>
   );

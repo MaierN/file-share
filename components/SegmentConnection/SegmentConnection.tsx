@@ -6,13 +6,13 @@ import { MdLogin } from "react-icons/md";
 import { FormEvent, useState } from "react";
 
 export default function SegmentConnection() {
-  const { selfId } = useSocketContext();
-  const [otherId, setOtherId] = useState<string>("");
-  const selfUrl = `${window.location.origin}/link/${selfId}`;
+  const { serverState, socket } = useSocketContext();
+  const [otherId, setOtherId] = useState("");
+  const selfUrl = `${window.location.origin}/link/${serverState.id}`;
 
   function handleConnect(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log("ok");
+    socket.emit("connectTo", otherId);
   }
 
   return (
@@ -38,7 +38,7 @@ export default function SegmentConnection() {
           </button>
         </form>
         <div className={styles.subtitle}>This device&apos;s code:</div>
-        <CopyableField value={selfId} />
+        <CopyableField value={serverState.id} />
       </div>
     </div>
   );

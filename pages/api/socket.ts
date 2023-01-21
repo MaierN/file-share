@@ -2,12 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { Server as HTTPServer } from "http";
 import type { Socket as NetSocket } from "net";
 import { Server as IOServer } from "socket.io";
-import { handleClient } from "../../backend/server";
+import { handleClient, SocketData } from "../../backend/server";
 import type { InterServerEvents } from "../../backend/server";
 import {
   ClientToServerEvents,
+  Id,
   ServerToClientEvents,
-  SocketData,
 } from "../../shared/types";
 
 interface SocketServer extends HTTPServer {

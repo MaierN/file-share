@@ -1,15 +1,25 @@
+import { Operation } from "fast-json-patch";
+import { z } from "zod";
+import { ClientState } from "../backend/syncState";
+import { Untrusted, validators } from "../backend/validation";
+
 type Id = string;
 
+type ServerMessage = {
+  type: "error" | "info";
+  text: string;
+};
+
 interface ServerToClientEvents {
-  selfId: (id: Id) => void;
+  initState: (state: ClientState) => void;
+  diffState: (diff: Operation[]) => void;
+  showMessage: (message: ServerMessage) => void;
 }
 
-interface ClientToServerEvents {
-  linkToId: (id: Id) => void;
-}
+type ClientToServerEvents = {
+  [EventName in keyof typeof validators]: (
+    arg: Untrusted<z.infer<typeof validators[EventName]>>
+  ) => void;
+};
 
-interface SocketData {
-  id: Id;
-}
-
-export type { Id, ServerToClientEvents, ClientToServerEvents, SocketData };
+export type { Id, ServerToClientEvents, ClientToServerEvents };
