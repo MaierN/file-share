@@ -5,26 +5,29 @@ import {
   useState,
   createContext,
   useContext,
+  useCallback,
 } from "react";
+import { flushSync } from "react-dom";
 import { Socket } from "socket.io-client";
 import io from "socket.io-client";
 import {
   ClientToServerEvents,
   Id,
   ServerToClientEvents,
-} from "../shared/types";
-import LoadingIndicator from "./LoadingIndicator/LoadingIndicator";
-import { ClientState } from "../backend/syncState";
+} from "../../shared/types";
+import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
+import { ClientState } from "../../backend/syncState";
 import produce from "immer";
 import { applyPatch } from "fast-json-patch";
 
-type SocketContextType = {
-  connected: boolean;
-  serverState: ClientState;
-  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-};
-
-const SocketContext = createContext<SocketContextType | undefined>(undefined);
+const SocketContext = createContext<
+  | {
+      connected: boolean;
+      serverState: ClientState;
+      socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+    }
+  | undefined
+>(undefined);
 
 function useSocketContext() {
   const context = useContext(SocketContext);
@@ -39,8 +42,17 @@ function SocketHandler({ children }: { children: ReactNode }) {
     Socket<ServerToClientEvents, ClientToServerEvents> | undefined
   >(undefined);
   const [connected, setConnected] = useState<boolean>(false);
-  const [serverState, setServerState] = useState<ClientState | undefined>(
+  const [serverState, _setServerState] = useState<ClientState | undefined>(
     undefined
+  );
+
+  const setServerState = useCallback(
+    (arg: Parameters<typeof _setServerState>[0]) => {
+      flushSync(() => {
+        _setServerState(arg);
+      });
+    },
+    []
   );
 
   useEffect(() => {

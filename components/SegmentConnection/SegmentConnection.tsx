@@ -1,7 +1,7 @@
 import QRCode from "react-qr-code";
 import CopyableField from "../CopyableField/CopyableField";
 import styles from "./SegmentConnection.module.css";
-import { useSocketContext } from "../SocketHandler";
+import { useSocketContext } from "../SocketHandler/SocketHandler";
 import { MdLogin } from "react-icons/md";
 import { FormEvent, useState } from "react";
 
