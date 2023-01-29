@@ -9,13 +9,36 @@ import {
 } from "react";
 import useEffectOnce from "../../hooks/useEffectOnce";
 import { useSocketContext } from "../SocketHandler/SocketHandler";
-import { flushSync } from "react-dom";
 import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
+
+type MessageInfo = {
+  id: string;
+  timeAdded: number;
+  text: string;
+};
+
+type ControlMessage = {
+  type: string;
+  data?: MessageInfo;
+};
+
+type FileInfo = {
+  id: string;
+  name: string;
+  size: number;
+  timeAdded: number;
+  received: number;
+  arrayBuffers: ArrayBuffer[];
+  objectUrl?: string;
+};
+
+type FileChannel = RTCDataChannel & { fileInfo: FileInfo };
 
 const RtcContext = createContext<
   | {
-      send: (message: string) => void;
-      lastMessage: string;
+      sendText: (text: string) => void;
+      sendFile: (file: File) => void;
+      elements: (FileInfo | MessageInfo)[];
     }
   | undefined
 >(undefined);
@@ -31,17 +54,16 @@ function useRtcContext() {
 function RtcHandler({ children }: { children: ReactNode }) {
   const { serverState, socket } = useSocketContext();
   const connectedTo = serverState.connectedTo!;
-  const dataChannel = useRef<RTCDataChannel>();
-  const [lastMessage, _setLastMessage] = useState("");
-
-  const setLastMessage = useCallback(
-    (arg: Parameters<typeof _setLastMessage>[0]) => {
-      flushSync(() => {
-        _setLastMessage(arg);
-      });
-    },
-    []
-  );
+  const [controlChannel, setControlChannel] = useState<RTCDataChannel>();
+  const [ready, setReady] = useState(false);
+  const [sendingChannels, setSendingChannels] = useState<{
+    [key: string]: FileChannel;
+  }>({});
+  const [receivingChannels, setReceivingChannels] = useState<{
+    [key: string]: FileChannel;
+  }>({});
+  const [textMessages, setTextMessages] = useState<MessageInfo[]>([]);
+  const messageCountRef = useRef(connectedTo.isMaster ? 0 : 1);
 
   const peerConnection = useRef<RTCPeerConnection>(
     new RTCPeerConnection({
@@ -53,9 +75,72 @@ function RtcHandler({ children }: { children: ReactNode }) {
   );
 
   useEffectOnce(() => {
-    function handleMessage(message: string) {
-      console.log("received message:", message);
-      setLastMessage(message);
+    function handleControlMessage(message: ControlMessage) {
+      const actions: { [key: string]: any } = {
+        ready: () => setReady(true),
+        text: (data: MessageInfo) => {
+          console.log("received text:", data);
+          setTextMessages((prev) => [...prev, data]);
+        },
+      };
+
+      if (actions.hasOwnProperty(message.type)) {
+        actions[message.type](message.data);
+      } else {
+        console.log("unknown control message type:", message);
+      }
+    }
+
+    function handleControlChannel(channel: RTCDataChannel) {
+      channel.onopen = () => {
+        console.log(`control channel ${channel.id} ${channel.label} open`);
+        setControlChannel(channel);
+        channel.send(JSON.stringify({ type: "ready" }));
+      };
+      channel.onmessage = (e) => handleControlMessage(JSON.parse(e.data));
+      channel.onerror = (e) => console.log("control channel error:", e);
+    }
+
+    function handleFileMessage(channel: FileChannel, message: any) {
+      if (typeof message === "string") {
+        channel.fileInfo = JSON.parse(message);
+        console.log("file info:", channel.fileInfo);
+        setReceivingChannels((prev) => ({
+          ...prev,
+          [channel.label]: channel,
+        }));
+      } else {
+        console.log("received chunk", message.byteLength, message);
+
+        const fileInfo = channel.fileInfo;
+        fileInfo.arrayBuffers!.push(message);
+        fileInfo.received += message.byteLength;
+
+        console.log(fileInfo.received, fileInfo.size);
+
+        if (fileInfo.received === fileInfo.size) {
+          console.log("file received:", fileInfo);
+          const blob = new Blob(fileInfo.arrayBuffers);
+          fileInfo.objectUrl = URL.createObjectURL(blob);
+
+          channel.close();
+        }
+
+        setReceivingChannels((prev) => ({
+          ...prev,
+          [channel.label]: channel,
+        }));
+      }
+    }
+
+    function handleFileChannel(channel: RTCDataChannel) {
+      channel.binaryType = "arraybuffer";
+      channel.onopen = () => {
+        console.log(`file dataChannel ${channel.id} ${channel.label} open`);
+      };
+      channel.onmessage = (e) =>
+        handleFileMessage(channel as FileChannel, e.data);
+      channel.onerror = (e) => console.log("file channel error:", e);
     }
 
     peerConnection.current.onicecandidate = (e) => {
@@ -63,21 +148,18 @@ function RtcHandler({ children }: { children: ReactNode }) {
     };
 
     peerConnection.current.ondatachannel = (e) => {
-      dataChannel.current = e.channel;
-      console.log(`data channel ${dataChannel.current.label} received`);
-      dataChannel.current.onmessage = (e) => handleMessage(e.data);
-      dataChannel.current.onerror = (e) =>
-        console.error("dataChannel error:", e);
+      if (e.channel.label === "control") {
+        handleControlChannel(e.channel);
+      } else {
+        handleFileChannel(e.channel);
+      }
     };
 
     if (connectedTo.isMaster) {
-      const channel = peerConnection.current.createDataChannel("channel");
-      channel.onopen = () => {
-        console.log(`data ${channel.label} channel opened`);
-        dataChannel.current = channel;
-      };
-      channel.onmessage = (e) => handleMessage(e.data);
-      channel.onerror = (e) => console.error("dataChannel error:", e);
+      const controlChannel =
+        peerConnection.current.createDataChannel("control");
+
+      handleControlChannel(controlChannel);
 
       peerConnection.current.createOffer().then((description) => {
         peerConnection.current.setLocalDescription(description).then(() => {
@@ -118,19 +200,106 @@ function RtcHandler({ children }: { children: ReactNode }) {
     console.log("added ice candidate:", connectedTo.otherLastIceCandidate);
   }, [connectedTo.otherLastIceCandidate]);
 
-  const send = useCallback((message: string) => {
-    dataChannel.current!.send(message);
+  const sendText = useCallback(
+    (text: string) => {
+      const message = {
+        type: "text",
+        data: {
+          id: "text-" + messageCountRef.current,
+          timeAdded: Date.now(),
+          text,
+        },
+      };
+      controlChannel!.send(JSON.stringify(message));
+      setTextMessages((prev) => [...prev, message.data]);
+      messageCountRef.current += 2;
+    },
+    [controlChannel]
+  );
+
+  const sendFile = useCallback((file: File) => {
+    const channel = peerConnection.current.createDataChannel(
+      "file-" + messageCountRef.current
+    ) as FileChannel;
+    messageCountRef.current += 2;
+    channel.binaryType = "arraybuffer";
+
+    channel.onopen = async () => {
+      channel.fileInfo = {
+        id: channel.label,
+        name: file.name,
+        size: file.size,
+        timeAdded: Date.now(),
+        arrayBuffers: [],
+        received: 0,
+      };
+      channel.send(JSON.stringify(channel.fileInfo));
+
+      const CHUNK_SIZE = 16384;
+
+      const fileData: ArrayBuffer[] = [];
+      const fileDataReady: Promise<void>[] = [];
+      for (let i = 0; i < file.size; i += CHUNK_SIZE) {
+        const idx = fileData.length;
+        fileData.push(new ArrayBuffer(0));
+        fileDataReady.push(
+          new Promise<void>(async (resolve) => {
+            fileData[idx] = await file.slice(i, i + CHUNK_SIZE).arrayBuffer();
+            resolve();
+          })
+        );
+      }
+      await Promise.all(fileDataReady);
+      console.log("ended reading");
+
+      channel.fileInfo.received = file.size;
+      const blob = new Blob(fileData);
+      channel.fileInfo.objectUrl = URL.createObjectURL(blob);
+
+      setSendingChannels((prev) => ({
+        ...prev,
+        [channel.label]: channel,
+      }));
+
+      let bufferedAmountLow;
+      for (let i = 0; i < fileData.length; i++) {
+        if (i !== 0) {
+          await bufferedAmountLow;
+        }
+        channel.send(fileData[i]);
+
+        bufferedAmountLow = new Promise<void>((resolve) => {
+          const listener = () => {
+            channel.removeEventListener("bufferedamountlow", listener);
+            resolve();
+          };
+          channel.addEventListener("bufferedamountlow", listener);
+        });
+      }
+      console.log("ended sending");
+    };
   }, []);
 
-  if (dataChannel.current === undefined) {
-    return <LoadingIndicator />;
-  }
+  if (!ready) return <LoadingIndicator />;
 
   return (
-    <RtcContext.Provider value={{ send, lastMessage }}>
+    <RtcContext.Provider
+      value={{
+        sendText,
+        sendFile,
+        elements: ([] as (MessageInfo | FileInfo)[])
+          .concat(
+            textMessages,
+            Object.values(receivingChannels).map((channel) => channel.fileInfo),
+            Object.values(sendingChannels).map((channel) => channel.fileInfo)
+          )
+          .sort((a, b) => b.timeAdded - a.timeAdded),
+      }}
+    >
       {children}
     </RtcContext.Provider>
   );
 }
 
+export type { MessageInfo, FileInfo };
 export { useRtcContext, RtcHandler };

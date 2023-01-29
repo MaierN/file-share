@@ -46,16 +46,13 @@ function SocketHandler({ children }: { children: ReactNode }) {
     undefined
   );
 
-  const setServerState = useCallback(
-    (arg: Parameters<typeof _setServerState>[0]) => {
+  useEffect(() => {
+    function setServerState(arg: Parameters<typeof _setServerState>[0]) {
       flushSync(() => {
         _setServerState(arg);
       });
-    },
-    []
-  );
+    }
 
-  useEffect(() => {
     async function connect() {
       console.log("connecting...");
 
