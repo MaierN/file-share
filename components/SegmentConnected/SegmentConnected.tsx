@@ -28,6 +28,8 @@ export default function SegmentConnected() {
     setTextInput("");
   }
 
+  // TODO stlye file input
+
   return (
     <>
       <div className={styles.container}>

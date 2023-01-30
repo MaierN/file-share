@@ -32,7 +32,7 @@ function addEventHandler<EventName extends keyof typeof validators>(
   name: EventName,
   callback: (arg: z.infer<typeof validators[EventName]>) => void
 ) {
-  // TODO create issue on socket.io
+  // maybe create issue on socket.io
   // @ts-expect-error
   socket.on(name, (arg: any) => {
     const res = validateEvent(name, arg);
