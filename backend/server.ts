@@ -73,6 +73,7 @@ function handleClient(
 
     if (clientId === otherId) {
       console.error("client cannot connect to itself");
+      socket.emit("showMessage", { type: "error", text: "Invalid code" });
       return;
     }
 
@@ -84,6 +85,7 @@ function handleClient(
 
     if (!getState().connectedClients.hasOwnProperty(otherId)) {
       console.error("other client not found");
+      socket.emit("showMessage", { type: "error", text: "Invalid code" });
       return;
     }
 
@@ -91,6 +93,7 @@ function handleClient(
 
     if (otherClient.connectedTo !== undefined) {
       console.error("other client already connected to someone");
+      socket.emit("showMessage", { type: "error", text: "Invalid code" });
       return;
     }
 

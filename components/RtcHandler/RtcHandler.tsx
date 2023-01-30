@@ -118,8 +118,6 @@ function RtcHandler({ children }: { children: ReactNode }) {
         fileInfo.arrayBuffers!.push(message);
         fileInfo.received += message.byteLength;
 
-        console.log(fileInfo.received, fileInfo.size);
-
         if (fileInfo.received === fileInfo.size) {
           console.log("file received:", fileInfo);
           const blob = new Blob(fileInfo.arrayBuffers);
@@ -239,6 +237,11 @@ function RtcHandler({ children }: { children: ReactNode }) {
       };
       channel.send(JSON.stringify(channel.fileInfo));
 
+      setSendingChannels((prev) => ({
+        ...prev,
+        [channel.label]: channel,
+      }));
+
       const CHUNK_SIZE = 16384;
 
       const fileData: ArrayBuffer[] = [];
@@ -249,6 +252,13 @@ function RtcHandler({ children }: { children: ReactNode }) {
         fileDataReady.push(
           new Promise<void>(async (resolve) => {
             fileData[idx] = await file.slice(i, i + CHUNK_SIZE).arrayBuffer();
+
+            channel.fileInfo.received += fileData[idx].byteLength;
+            setSendingChannels((prev) => ({
+              ...prev,
+              [channel.label]: channel,
+            }));
+
             resolve();
           })
         );

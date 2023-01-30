@@ -13,7 +13,6 @@ export default function SegmentConnected() {
   const [textInput, setTextInput] = useState("");
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    console.log(e, e.target.files);
     if (!e.target.files) return;
 
     Array.from(e.target.files).forEach((file) => {

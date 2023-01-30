@@ -9,11 +9,13 @@ export default function DownloadableField({
   className,
 }: {
   text: string;
-  content: string;
+  content?: string;
   IconLegend?: IconType;
   className?: string;
 }) {
   function download() {
+    if (content === undefined) return;
+
     const element = document.createElement("a");
     element.href = content;
     element.download = text;
@@ -28,6 +30,7 @@ export default function DownloadableField({
       IconLegend={IconLegend}
       IconPassive={MdDownload}
       IconActive={MdDone}
+      disabled={content === undefined}
       className={className}
     />
   );

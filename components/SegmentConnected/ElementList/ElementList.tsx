@@ -6,11 +6,18 @@ import DownloadableField from "../../ActionField/DownloadableField";
 import { MdDescription, MdEditNote } from "react-icons/md";
 
 function FileElement({ fileInfo }: { fileInfo: FileInfo }) {
+  let text = fileInfo.name;
+  if (fileInfo.received < fileInfo.size) {
+    text = `(${Math.round(
+      (fileInfo.received / fileInfo.size) * 100
+    )}%) ${text}`;
+  }
+
   return (
     <DownloadableField
-      text={fileInfo.name}
+      text={text}
       IconLegend={MdDescription}
-      content={fileInfo.objectUrl!}
+      content={fileInfo.objectUrl}
     />
   );
 }
@@ -35,7 +42,7 @@ export default function ElementList({
   `;
 
   const cssAnim = css`
-    animation: ${animAppear} 0.2s ease 0.1s both;
+    animation: ${animAppear} 0.2s ease 0.2s both;
   `;
 
   return (

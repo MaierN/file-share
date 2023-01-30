@@ -9,13 +9,13 @@
 
 .element {
   position: absolute;
-  transition: transform 0.1s ease;
+  transition: transform 0.2s ease;
   width: 100%;
   padding: 0.5rem 0 0 0;
 }
 
 .ghostElement {
-  opacity: 0.1;
+  opacity: 0;
   overflow: hidden;
   padding: 0.5rem 0 0 0;
 }
