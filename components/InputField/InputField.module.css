@@ -1,0 +1,46 @@
+.container {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #202020;
+}
+
+.input {
+  background-color: #202020;
+  color: inherit;
+  line-height: 1.5;
+  padding: 0.5rem;
+  border: 0;
+  outline: none;
+}
+
+.container:has(input:focus) {
+  outline: 1px solid white;
+}
+
+.button {
+  background-color: #202020;
+  color: white;
+  border: 0;
+  font-weight: bold;
+  height: 2.5rem;
+  width: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.button:hover {
+  background-color: white;
+  color: #202020;
+}
+
+.button > svg {
+  font-size: 1.5rem;
+}

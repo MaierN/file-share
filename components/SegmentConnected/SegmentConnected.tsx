@@ -1,5 +1,6 @@
 import { useRef, ChangeEvent, useState, FormEvent } from "react";
-import { MdLogin } from "react-icons/md";
+import { MdSend } from "react-icons/md";
+import InputField from "../InputField/InputField";
 import { useRtcContext } from "../RtcHandler/RtcHandler";
 import { useSocketContext } from "../SocketHandler/SocketHandler";
 import ElementList from "./ElementList/ElementList";
@@ -37,17 +38,16 @@ export default function SegmentConnected() {
         {connectedTo.otherId}, {elements.length}
       </div>
       <div>
+        Share file:
         <input type="file" ref={fileInputRef} onChange={handleFileChange} />
+        Share text:
         <form onSubmit={handleSendMessage}>
-          <input
-            type="text"
-            placeholder="other device's code"
+          <InputField
+            placeholder="..."
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
+            Icon={MdSend}
           />
-          <button type="submit">
-            <MdLogin />
-          </button>
         </form>
       </div>
       <div>

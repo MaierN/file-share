@@ -1,0 +1,54 @@
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #101010;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  min-width: 0;
+}
+
+.text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  white-space: pre;
+  flex-grow: 1;
+}
+
+.icon {
+  font-size: 1.5rem;
+  line-height: 3rem;
+  margin-left: 0.5rem;
+  display: block;
+}
+
+.iconPassive {
+  cursor: pointer;
+}
+
+.iconActive {
+  color: #91ff91;
+}
+
+.disabled {
+  cursor: default;
+}
+
+.legend {
+  background-color: #202020;
+  height: 1.5rem;
+  margin: -0.6rem 0.6rem -0.6rem -0.6rem;
+  border-radius: 0.6rem;
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legendIcon {
+  font-size: 1.5rem;
+  line-height: 3rem;
+  display: block;
+}

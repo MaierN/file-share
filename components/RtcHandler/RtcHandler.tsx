@@ -65,14 +65,16 @@ function RtcHandler({ children }: { children: ReactNode }) {
   const [textMessages, setTextMessages] = useState<MessageInfo[]>([]);
   const messageCountRef = useRef(connectedTo.isMaster ? 0 : 1);
 
-  const peerConnection = useRef<RTCPeerConnection>(
-    new RTCPeerConnection({
+  const peerConnection = useRef<RTCPeerConnection | undefined>(undefined);
+
+  useEffectOnce(() => {
+    peerConnection.current = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun.stunprotocol.org:3478" },
       ],
-    })
-  );
+    });
+  });
 
   useEffectOnce(() => {
     function handleControlMessage(message: ControlMessage) {
@@ -143,11 +145,11 @@ function RtcHandler({ children }: { children: ReactNode }) {
       channel.onerror = (e) => console.log("file channel error:", e);
     }
 
-    peerConnection.current.onicecandidate = (e) => {
+    peerConnection.current!.onicecandidate = (e) => {
       socket.emit("rtcIceCandidate", JSON.stringify(e.candidate));
     };
 
-    peerConnection.current.ondatachannel = (e) => {
+    peerConnection.current!.ondatachannel = (e) => {
       if (e.channel.label === "control") {
         handleControlChannel(e.channel);
       } else {
@@ -157,12 +159,12 @@ function RtcHandler({ children }: { children: ReactNode }) {
 
     if (connectedTo.isMaster) {
       const controlChannel =
-        peerConnection.current.createDataChannel("control");
+        peerConnection.current!.createDataChannel("control");
 
       handleControlChannel(controlChannel);
 
-      peerConnection.current.createOffer().then((description) => {
-        peerConnection.current.setLocalDescription(description).then(() => {
+      peerConnection.current!.createOffer().then((description) => {
+        peerConnection.current!.setLocalDescription(description).then(() => {
           socket.emit("rtcDescription", JSON.stringify(description));
 
           console.log("master sent local description:", description);
@@ -176,13 +178,15 @@ function RtcHandler({ children }: { children: ReactNode }) {
 
     console.log("setting remote description:", connectedTo.otherRtcDescription);
 
-    peerConnection.current
-      .setRemoteDescription(JSON.parse(connectedTo.otherRtcDescription))
+    peerConnection
+      .current!.setRemoteDescription(
+        JSON.parse(connectedTo.otherRtcDescription)
+      )
       .then(() => {
         if (connectedTo.isMaster) return;
 
-        peerConnection.current.createAnswer().then((answer) => {
-          peerConnection.current.setLocalDescription(answer).then(() => {
+        peerConnection.current!.createAnswer().then((answer) => {
+          peerConnection.current!.setLocalDescription(answer).then(() => {
             socket.emit("rtcDescription", JSON.stringify(answer));
 
             console.log("slave sent local description:", answer);
@@ -194,7 +198,7 @@ function RtcHandler({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (connectedTo.otherLastIceCandidate === undefined) return;
 
-    peerConnection.current.addIceCandidate(
+    peerConnection.current!.addIceCandidate(
       JSON.parse(connectedTo.otherLastIceCandidate)
     );
     console.log("added ice candidate:", connectedTo.otherLastIceCandidate);
@@ -218,7 +222,7 @@ function RtcHandler({ children }: { children: ReactNode }) {
   );
 
   const sendFile = useCallback((file: File) => {
-    const channel = peerConnection.current.createDataChannel(
+    const channel = peerConnection.current!.createDataChannel(
       "file-" + messageCountRef.current
     ) as FileChannel;
     messageCountRef.current += 2;

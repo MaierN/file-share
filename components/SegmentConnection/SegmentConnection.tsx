@@ -1,9 +1,10 @@
 import QRCode from "react-qr-code";
-import CopyableField from "../CopyableField/CopyableField";
+import CopyableField from "../ActionField/CopyableField";
 import styles from "./SegmentConnection.module.css";
 import { useSocketContext } from "../SocketHandler/SocketHandler";
 import { MdLogin } from "react-icons/md";
 import { FormEvent, useState } from "react";
+import InputField from "../InputField/InputField";
 
 export default function SegmentConnection() {
   const { serverState, socket } = useSocketContext();
@@ -25,17 +26,13 @@ export default function SegmentConnection() {
       <div className={styles.separator} />
       <div className={styles.subContainer}>
         <div className={styles.title}>Or connect using a code</div>
-        <form className={styles.connectForm} onSubmit={handleConnect}>
-          <input
-            className={styles.idInput}
-            type="text"
+        <form onSubmit={handleConnect}>
+          <InputField
             placeholder="other device's code"
             value={otherId}
             onChange={(e) => setOtherId(e.target.value)}
+            Icon={MdLogin}
           />
-          <button className={styles.connectButton} type="submit">
-            <MdLogin />
-          </button>
         </form>
         <div className={styles.subtitle}>This device&apos;s code:</div>
         <CopyableField value={serverState.id} />

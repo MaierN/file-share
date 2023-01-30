@@ -1,0 +1,21 @@
+.container {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.element {
+  position: absolute;
+  transition: transform 0.1s ease;
+  width: 100%;
+  padding: 0.5rem 0 0 0;
+}
+
+.ghostElement {
+  opacity: 0.1;
+  overflow: hidden;
+  padding: 0.5rem 0 0 0;
+}

@@ -14,53 +14,6 @@
   text-align: center;
 }
 
-.connectForm {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background-color: #202020;
-}
-
-.idInput {
-  background-color: #202020;
-  color: inherit;
-  line-height: 1.5;
-  padding: 0.5rem;
-  border: 0;
-  outline: none;
-}
-
-.connectForm:has(input:focus) {
-  outline: 1px solid white;
-}
-
-.connectButton {
-  background-color: #202020;
-  color: white;
-  border: 0;
-  font-weight: bold;
-  height: 2.5rem;
-  width: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-
-  transition: background-color 0.1s, color 0.1s;
-}
-
-.connectButton:hover {
-  background-color: white;
-  color: #202020;
-}
-
-.connectButton > svg {
-  font-size: 1.5rem;
-}
-
 .subtitle {
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
