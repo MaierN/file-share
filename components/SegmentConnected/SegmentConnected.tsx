@@ -2,12 +2,10 @@ import { useRef, ChangeEvent, useState, FormEvent } from "react";
 import { MdSend } from "react-icons/md";
 import InputField from "../InputField/InputField";
 import { useRtcContext } from "../RtcHandler/RtcHandler";
-import { useSocketContext } from "../SocketHandler/SocketHandler";
 import ElementList from "./ElementList/ElementList";
+import styles from "./SegmentConnected.module.css";
 
 export default function SegmentConnected() {
-  const { serverState } = useSocketContext();
-  const connectedTo = serverState.connectedTo!;
   const { sendText, sendFile, elements } = useRtcContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [textInput, setTextInput] = useState("");
@@ -31,27 +29,27 @@ export default function SegmentConnected() {
   }
 
   return (
-    <div>
-      <div>
-        This device&apos;s code: {serverState.id}, Other device&apos;s code:{" "}
-        {connectedTo.otherId}, {elements.length}
+    <>
+      <div className={styles.container}>
+        <div className={styles.subContainer}>
+          send file{" "}
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} />
+        </div>
+        <div className={styles.subContainer}>
+          <form onSubmit={handleSendMessage}>
+            <InputField
+              placeholder="send text"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              Icon={MdSend}
+            />
+          </form>
+        </div>
       </div>
-      <div>
-        Share file:
-        <input type="file" ref={fileInputRef} onChange={handleFileChange} />
-        Share text:
-        <form onSubmit={handleSendMessage}>
-          <InputField
-            placeholder="..."
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            Icon={MdSend}
-          />
-        </form>
-      </div>
+      <div className={styles.separator} />
       <div>
         <ElementList elements={elements} />
       </div>
-    </div>
+    </>
   );
 }

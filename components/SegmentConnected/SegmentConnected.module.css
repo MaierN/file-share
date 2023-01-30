@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  text-align: center;
+}
+
+.subContainer {
+  margin-top: 1.5rem;
+}
+
+.separator {
+  background-color: white;
+  height: 2px;
+  border-radius: 1px;
+  margin: 2rem 0 2rem 0;
+}
+
+@media (max-width: 800px) {
+  .container {
+    flex-direction: column;
+  }
+}

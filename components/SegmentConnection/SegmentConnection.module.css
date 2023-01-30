@@ -1,3 +1,10 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  text-align: center;
+}
+
 .title {
   font-size: 1.5rem;
   margin: 2rem 0;
@@ -5,13 +12,6 @@
 
 .link {
   text-decoration: underline;
-}
-
-.container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  text-align: center;
 }
 
 .subtitle {
