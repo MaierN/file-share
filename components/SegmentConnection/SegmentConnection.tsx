@@ -9,7 +9,7 @@ import InputField from "../InputField/InputField";
 export default function SegmentConnection() {
   const { serverState, socket } = useSocketContext();
   const [otherId, setOtherId] = useState("");
-  const selfUrl = `${window.location.origin}/link/${serverState.id}`;
+  const selfUrl = `${window.location.origin}${window.location.pathname}?code=${serverState.id}`;
 
   function handleConnect(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

@@ -11,20 +11,20 @@ import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
 
-function SubPage({ link = false }: { link?: boolean }) {
+function SubPage() {
   const router = useRouter();
   const sentRef = useRef(false);
   const { serverState, socket } = useSocketContext();
 
   useEffect(() => {
-    if (link && typeof router.query.id === "string" && !sentRef.current) {
+    if (typeof router.query.code === "string" && !sentRef.current) {
       sentRef.current = true;
-      socket.emit("connectTo", router.query.id);
+      socket.emit("connectTo", router.query.code);
     }
-  }, [link, socket, router.query]);
+  }, [router.query, socket]);
 
   return serverState.connectedTo === undefined ? (
-    link ? (
+    typeof router.query.code === "string" ? (
       <LoadingIndicator />
     ) : (
       <SegmentConnection />
@@ -36,11 +36,11 @@ function SubPage({ link = false }: { link?: boolean }) {
   );
 }
 
-export default function Index({ link = false }: { link?: boolean }) {
+export default function Index() {
   return (
     <main className={`${styles.main} ${poppins.className}`}>
       <SocketHandler>
-        <SubPage link={link} />
+        <SubPage />
       </SocketHandler>
     </main>
   );

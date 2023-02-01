@@ -8,13 +8,13 @@ type Id = string;
 type ServerMessage = {
   type: "error" | "info";
   text: string;
-  redirectToIndex?: boolean;
 };
 
 interface ServerToClientEvents {
   initState: (state: ClientState) => void;
   diffState: (diff: Operation[]) => void;
   showMessage: (message: ServerMessage) => void;
+  redirect: (path: string) => void;
 }
 
 type ClientToServerEvents = {

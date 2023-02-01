@@ -49,7 +49,7 @@ function SocketHandler({ children }: { children: ReactNode }) {
   );
   const router = useRouter();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     function setServerState(arg: Parameters<typeof _setServerState>[0]) {
       flushSync(() => {
         _setServerState(arg);
@@ -92,11 +92,11 @@ function SocketHandler({ children }: { children: ReactNode }) {
         } else {
           toast.info(message.text);
         }
+      });
 
-        if (message.redirectToIndex) {
-          console.log("redirecting to index...");
-          router.replace("/");
-        }
+      socket.current.on("redirect", (path: string) => {
+        console.log("redirecting to", path);
+        router.replace(path);
       });
     }
     const f = connect();
@@ -107,7 +107,7 @@ function SocketHandler({ children }: { children: ReactNode }) {
         socket.current?.disconnect();
       });
     };
-  }, [router]);
+  });
 
   useEffect(() => {
     console.log("serverState:", serverState);

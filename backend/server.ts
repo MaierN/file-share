@@ -91,8 +91,8 @@ function handleClient(
       socket.emit("showMessage", {
         type: "error",
         text: "Empty code",
-        redirectToIndex: true,
       });
+      socket.emit("redirect", "/");
       return;
     }
 
@@ -101,8 +101,8 @@ function handleClient(
       socket.emit("showMessage", {
         type: "error",
         text: "Invalid code",
-        redirectToIndex: true,
       });
+      socket.emit("redirect", "/");
       return;
     }
 
@@ -117,8 +117,8 @@ function handleClient(
       socket.emit("showMessage", {
         type: "error",
         text: "Invalid code",
-        redirectToIndex: true,
       });
+      socket.emit("redirect", "/");
       return;
     }
 
@@ -129,8 +129,8 @@ function handleClient(
       socket.emit("showMessage", {
         type: "error",
         text: "Invalid code",
-        redirectToIndex: true,
       });
+      socket.emit("redirect", "/");
       return;
     }
 
@@ -144,6 +144,8 @@ function handleClient(
         isMaster: false,
       };
     });
+
+    socket.emit("redirect", "/");
 
     console.log("connection established");
   });
