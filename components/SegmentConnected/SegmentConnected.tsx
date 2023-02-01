@@ -32,7 +32,7 @@ export default function SegmentConnected() {
     <>
       <div className={styles.container}>
         <div className={styles.subContainer}>
-          <FileDropZone onFile={handleFile} text={"send file..."} />
+          <FileDropZone onFile={handleFile} text={"send a file..."} />
         </div>
         <div className={styles.subContainer}>
           <form onSubmit={handleSendMessage}>
