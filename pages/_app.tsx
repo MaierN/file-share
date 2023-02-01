@@ -5,8 +5,6 @@ import Head from "next/head";
 import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// TODO favicon
-
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
