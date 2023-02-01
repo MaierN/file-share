@@ -2,21 +2,14 @@
   display: grid;
   width: fit-content;
   max-width: 100%;
-  position: relative;
   top: -0.5rem;
   margin-left: auto;
   margin-right: auto;
+  margin-top: -0.5rem;
 }
 
 .element {
-  position: absolute;
-  transition: transform 0.2s ease;
+  transition: transform 1.3s ease;
   width: 100%;
-  padding: 0.5rem 0 0 0;
-}
-
-.ghostElement {
-  opacity: 0;
-  overflow: hidden;
   padding: 0.5rem 0 0 0;
 }

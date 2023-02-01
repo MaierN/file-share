@@ -31,6 +31,16 @@ export default function ElementList({
 }: {
   elements: (FileInfo | MessageInfo)[];
 }) {
+  const animOpen = keyframes`
+    from {
+      max-height: 0px;
+    }
+
+    to {
+      max-height: 2.7rem;
+    }
+  `;
+
   const animAppear = keyframes`
     from {
       opacity: 0;
@@ -42,27 +52,15 @@ export default function ElementList({
   `;
 
   const cssAnim = css`
-    animation: ${animAppear} 0.2s ease 0.2s both;
+    animation: ${animOpen} 0.2s ease both, ${animAppear} 0.2s ease 0.2s both;
   `;
+
+  // TODO message when 0 files/messages were uploaded yet
 
   return (
     <div className={styles.container}>
-      {elements.map((element) => (
-        <div key={element.id} className={styles.ghostElement}>
-          {"text" in element ? (
-            <MessageElement key={element.id} messageInfo={element} />
-          ) : (
-            <FileElement key={element.id} fileInfo={element} />
-          )}
-        </div>
-      ))}
       {elements.map((element, idx) => (
-        <div
-          key={element.id}
-          css={cssAnim}
-          className={styles.element}
-          style={{ transform: `translateY(${idx * 100}%)` }}
-        >
+        <div key={element.id} css={cssAnim} className={styles.element}>
           {"text" in element ? (
             <MessageElement key={element.id} messageInfo={element} />
           ) : (
