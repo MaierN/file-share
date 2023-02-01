@@ -12,3 +12,10 @@
   padding: 0.5rem 0 0 0;
   min-width: 0;
 }
+
+.empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+}

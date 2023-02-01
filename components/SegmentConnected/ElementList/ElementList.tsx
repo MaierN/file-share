@@ -55,21 +55,19 @@ export default function ElementList({
     animation: ${animOpen} 0.2s ease both, ${animAppear} 0.2s ease 0.2s both;
   `;
 
-  return (
+  return elements.length ? (
     <div className={styles.container}>
-      {elements.length ? (
-        elements.map((element, idx) => (
-          <div key={element.id} css={cssAnim} className={styles.element}>
-            {"text" in element ? (
-              <MessageElement key={element.id} messageInfo={element} />
-            ) : (
-              <FileElement key={element.id} fileInfo={element} />
-            )}
-          </div>
-        ))
-      ) : (
-        <div className={styles.empty}>No files/messages yet</div>
-      )}
+      {elements.map((element, idx) => (
+        <div key={element.id} css={cssAnim} className={styles.element}>
+          {"text" in element ? (
+            <MessageElement key={element.id} messageInfo={element} />
+          ) : (
+            <FileElement key={element.id} fileInfo={element} />
+          )}
+        </div>
+      ))}
     </div>
+  ) : (
+    <div className={styles.empty}>No files/messages yet</div>
   );
 }
