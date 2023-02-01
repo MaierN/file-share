@@ -68,6 +68,6 @@ export default function ElementList({
       ))}
     </div>
   ) : (
-    <div className={styles.empty}>No files/messages yet</div>
+    <div className={styles.empty}>No files/texts yet</div>
   );
 }
