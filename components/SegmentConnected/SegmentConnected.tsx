@@ -1,10 +1,11 @@
-import { useRef, ChangeEvent, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { MdSend } from "react-icons/md";
 import FileDropZone from "../FileDropZone/FileDropZone";
 import InputField from "../InputField/InputField";
 import { useRtcContext } from "../RtcHandler/RtcHandler";
 import ElementList from "./ElementList/ElementList";
 import styles from "./SegmentConnected.module.css";
+import { toast } from "react-toastify";
 
 export default function SegmentConnected() {
   const { sendText, sendFile, elements } = useRtcContext();
@@ -12,7 +13,11 @@ export default function SegmentConnected() {
 
   function handleFile(file: File) {
     console.log("sending file", file);
-    // TODO add file size limit
+    if (file.size > 10 ** 9 * 1.5) {
+      toast.error("File too big (>1.5GB)");
+      return;
+    }
+
     sendFile(file);
   }
 

@@ -6,6 +6,7 @@ import {
   createContext,
   useContext,
   ReactNode,
+  useMemo,
 } from "react";
 import useEffectOnce from "../../hooks/useEffectOnce";
 import { useSocketContext } from "../SocketHandler/SocketHandler";
@@ -112,8 +113,6 @@ function RtcHandler({ children }: { children: ReactNode }) {
           [channel.label]: channel,
         }));
       } else {
-        console.log("received chunk", message.byteLength, message);
-
         const fileInfo = channel.fileInfo;
         fileInfo.arrayBuffers!.push(message);
         fileInfo.received += message.byteLength;
@@ -262,6 +261,10 @@ function RtcHandler({ children }: { children: ReactNode }) {
             resolve();
           })
         );
+        if (fileDataReady.length >= 20) {
+          await Promise.all(fileDataReady);
+          fileDataReady.length = 0;
+        }
       }
       await Promise.all(fileDataReady);
       console.log("ended reading");
@@ -294,6 +297,18 @@ function RtcHandler({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const elements = useMemo(
+    () =>
+      ([] as (MessageInfo | FileInfo)[])
+        .concat(
+          textMessages,
+          Object.values(receivingChannels).map((channel) => channel.fileInfo),
+          Object.values(sendingChannels).map((channel) => channel.fileInfo)
+        )
+        .sort((a, b) => b.timeAdded - a.timeAdded),
+    [receivingChannels, sendingChannels, textMessages]
+  );
+
   if (!ready) return <LoadingIndicator />;
 
   return (
@@ -301,13 +316,7 @@ function RtcHandler({ children }: { children: ReactNode }) {
       value={{
         sendText,
         sendFile,
-        elements: ([] as (MessageInfo | FileInfo)[])
-          .concat(
-            textMessages,
-            Object.values(receivingChannels).map((channel) => channel.fileInfo),
-            Object.values(sendingChannels).map((channel) => channel.fileInfo)
-          )
-          .sort((a, b) => b.timeAdded - a.timeAdded),
+        elements,
       }}
     >
       {children}
