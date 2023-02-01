@@ -1,0 +1,33 @@
+.fileInput {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.fileLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #101010;
+  width: 12rem;
+  height: 10rem;
+  border-radius: 2rem;
+  padding: 1rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  border: 2px dashed white;
+  gap: 1rem;
+}
+
+.fileLabel > * {
+  pointer-events: none;
+}
+
+.fileLabelDragging {
+  border: 4px solid white;
+}
+
+.legend {
+  font-weight: bold;
+}

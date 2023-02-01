@@ -9,7 +9,7 @@
 }
 
 .element {
-  transition: transform 1.3s ease;
   width: 100%;
   padding: 0.5rem 0 0 0;
+  min-width: 0;
 }
