@@ -1,6 +1,14 @@
-import styles from "./CopyableField.module.css";
+import styles from "./LoadingIndicator.module.css";
 
-// TODO style loading indicator
 export default function LoadingIndicator() {
-  return <div>Loading...</div>;
+  return (
+    <div className={styles.container}>
+      <div className={styles["lds-ellipsis"]}>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  );
 }
