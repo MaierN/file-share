@@ -1,13 +1,10 @@
 .container {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 4rem;
   align-items: center;
   text-align: center;
-}
-
-.subContainer {
-  margin-top: 1.5rem;
 }
 
 .separator {
@@ -20,5 +17,10 @@
 @media (max-width: 800px) {
   .container {
     flex-direction: column;
+    gap: 0;
+  }
+
+  .subContainer:not(:first-child) {
+    margin-top: 1.5rem;
   }
 }
