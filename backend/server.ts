@@ -71,6 +71,12 @@ function handleClient(
 
     console.log(`client ${clientId} wants to connect to ${otherId}`);
 
+    if (clientId === "") {
+      console.error("client id is empty");
+      socket.emit("showMessage", { type: "error", text: "Empty code" });
+      return;
+    }
+
     if (clientId === otherId) {
       console.error("client cannot connect to itself");
       socket.emit("showMessage", { type: "error", text: "Invalid code" });

@@ -5,7 +5,6 @@ import {
   useState,
   createContext,
   useContext,
-  useCallback,
 } from "react";
 import { flushSync } from "react-dom";
 import { Socket } from "socket.io-client";
@@ -19,6 +18,7 @@ import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 import { ClientState } from "../../backend/syncState";
 import produce from "immer";
 import { applyPatch } from "fast-json-patch";
+import { toast } from "react-toastify";
 
 const SocketContext = createContext<
   | {
@@ -83,8 +83,12 @@ function SocketHandler({ children }: { children: ReactNode }) {
       });
 
       socket.current.on("showMessage", (message) => {
-        // TODO proper message
         console.log("showMessage:", message.type, message.text);
+        if (message.type === "error") {
+          toast.error(message.text);
+        } else {
+          toast.info(message.text);
+        }
       });
     }
     const f = connect();
