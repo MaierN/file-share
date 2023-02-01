@@ -22,6 +22,7 @@
     "next": "13.1.1",
     "normalize.css": "^8.0.1",
     "proxy-memoize": "^2.0.1",
+    "rate-limiter-flexible": "^2.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.7.1",

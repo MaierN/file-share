@@ -7,6 +7,12 @@ import {
 import { addEventHandler } from "./validation";
 import { addObserver, getState, mutState } from "./syncState";
 import { memoize } from "proxy-memoize";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
+const rateLimiterConnectTo = new RateLimiterMemory({
+  points: 5,
+  duration: 1,
+});
 
 function generateId(): Id {
   const CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I, O, 0, 1
@@ -66,10 +72,19 @@ function handleClient(
     });
   });
 
-  addEventHandler(socket, "connectTo", (otherId) => {
-    // TODO rate limit
-
+  addEventHandler(socket, "connectTo", async (otherId) => {
     console.log(`client ${clientId} wants to connect to ${otherId}`);
+
+    try {
+      await rateLimiterConnectTo.consume(socket.handshake.address);
+    } catch (e) {
+      console.error("rate limit exceeded");
+      socket.emit("showMessage", {
+        type: "error",
+        text: "Too many requests",
+      });
+      return;
+    }
 
     if (clientId === "") {
       console.error("client id is empty");
