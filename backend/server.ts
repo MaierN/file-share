@@ -88,13 +88,21 @@ function handleClient(
 
     if (clientId === "") {
       console.error("client id is empty");
-      socket.emit("showMessage", { type: "error", text: "Empty code" });
+      socket.emit("showMessage", {
+        type: "error",
+        text: "Empty code",
+        redirectToIndex: true,
+      });
       return;
     }
 
     if (clientId === otherId) {
       console.error("client cannot connect to itself");
-      socket.emit("showMessage", { type: "error", text: "Invalid code" });
+      socket.emit("showMessage", {
+        type: "error",
+        text: "Invalid code",
+        redirectToIndex: true,
+      });
       return;
     }
 
@@ -106,7 +114,11 @@ function handleClient(
 
     if (!getState().connectedClients.hasOwnProperty(otherId)) {
       console.error("other client not found");
-      socket.emit("showMessage", { type: "error", text: "Invalid code" });
+      socket.emit("showMessage", {
+        type: "error",
+        text: "Invalid code",
+        redirectToIndex: true,
+      });
       return;
     }
 
@@ -114,7 +126,11 @@ function handleClient(
 
     if (otherClient.connectedTo !== undefined) {
       console.error("other client already connected to someone");
-      socket.emit("showMessage", { type: "error", text: "Invalid code" });
+      socket.emit("showMessage", {
+        type: "error",
+        text: "Invalid code",
+        redirectToIndex: true,
+      });
       return;
     }
 

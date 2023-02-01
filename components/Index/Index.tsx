@@ -6,17 +6,19 @@ import styles from "./Index.module.css";
 import { Poppins } from "@next/font/google";
 import { SocketHandler } from "../SocketHandler/SocketHandler";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 
 const poppins = Poppins({ weight: "400", subsets: ["latin"] });
 
 function SubPage({ link = false }: { link?: boolean }) {
   const router = useRouter();
+  const sentRef = useRef(false);
   const { serverState, socket } = useSocketContext();
 
   useEffect(() => {
-    if (link && typeof router.query.id === "string") {
+    if (link && typeof router.query.id === "string" && !sentRef.current) {
+      sentRef.current = true;
       socket.emit("connectTo", router.query.id);
     }
   }, [link, socket, router.query]);

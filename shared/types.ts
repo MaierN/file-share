@@ -8,6 +8,7 @@ type Id = string;
 type ServerMessage = {
   type: "error" | "info";
   text: string;
+  redirectToIndex?: boolean;
 };
 
 interface ServerToClientEvents {

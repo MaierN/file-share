@@ -19,6 +19,8 @@ import { ClientState } from "../../backend/syncState";
 import produce from "immer";
 import { applyPatch } from "fast-json-patch";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
+import useEffectOnce from "../../hooks/useEffectOnce";
 
 const SocketContext = createContext<
   | {
@@ -45,6 +47,7 @@ function SocketHandler({ children }: { children: ReactNode }) {
   const [serverState, _setServerState] = useState<ClientState | undefined>(
     undefined
   );
+  const router = useRouter();
 
   useEffect(() => {
     function setServerState(arg: Parameters<typeof _setServerState>[0]) {
@@ -89,16 +92,22 @@ function SocketHandler({ children }: { children: ReactNode }) {
         } else {
           toast.info(message.text);
         }
+
+        if (message.redirectToIndex) {
+          console.log("redirecting to index...");
+          router.replace("/");
+        }
       });
     }
     const f = connect();
 
     return () => {
       f.then(() => {
+        console.log("disconnecting...");
         socket.current?.disconnect();
       });
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     console.log("serverState:", serverState);
