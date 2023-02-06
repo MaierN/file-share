@@ -30,7 +30,7 @@ export default function SegmentConnection() {
           <InputField
             placeholder="other device's code"
             value={otherId}
-            onChange={(e) => setOtherId(e.target.value)}
+            onChange={(e) => setOtherId(e.target.value.toUpperCase())}
             Icon={MdLogin}
           />
         </form>
