@@ -34,6 +34,7 @@ export default function SegmentConnection() {
             value={otherId}
             onChange={(e) => setOtherId(e.target.value.toUpperCase())}
             Icon={MdLogin}
+            autoFocus
           />
         </form>
         <div className={styles.subtitle}>This device&apos;s code:</div>
