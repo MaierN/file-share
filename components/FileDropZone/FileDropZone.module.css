@@ -11,13 +11,14 @@
   justify-content: center;
   background-color: #101010;
   width: 14rem;
-  height: 12rem;
+  aspect-ratio: 1;
   border-radius: 2rem;
   padding: 1rem;
   cursor: pointer;
   box-sizing: border-box;
   border: 2px dashed white;
   gap: 1rem;
+  max-width: 100%;
 }
 
 .fileLabel > * {

@@ -20,13 +20,15 @@ export default function SegmentConnection() {
     <div className={styles.container}>
       <div className={styles.subContainer}>
         <div className={styles.title}>Open this link on another device</div>
-        <QRCode value={selfUrl} className={styles.qrcode} />
+        <div className={styles.qrcodeContainer}>
+          <QRCode value={selfUrl} className={styles.qrcode} />
+        </div>
         <CopyableField value={selfUrl} className={styles.link} />
       </div>
       <div className={styles.separator} />
       <div className={styles.subContainer}>
         <div className={styles.title}>Or connect using a code</div>
-        <form onSubmit={handleConnect}>
+        <form className={styles.connectForm} onSubmit={handleConnect}>
           <InputField
             placeholder="other device's code"
             value={otherId}

@@ -35,7 +35,7 @@ export default function SegmentConnected() {
           <FileDropZone onFile={handleFile} text={"send a file..."} />
         </div>
         <div className={styles.subContainer}>
-          <form onSubmit={handleSendMessage}>
+          <form className={styles.sendForm} onSubmit={handleSendMessage}>
             <InputField
               placeholder="...or send text"
               value={textInput}

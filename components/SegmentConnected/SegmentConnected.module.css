@@ -7,11 +7,19 @@
   text-align: center;
 }
 
+.subContainer {
+  max-width: 100%;
+}
+
 .separator {
   background-color: white;
   height: 2px;
   border-radius: 1px;
   margin: 2rem 0 2rem 0;
+}
+
+.sendForm {
+  max-width: 100%;
 }
 
 @media (max-width: 800px) {
